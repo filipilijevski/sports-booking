@@ -17,7 +17,6 @@ A full stack platform for local sports clubs (table tennis, tennis, badminton, b
 
   * [Backend env vars](#backend-env-vars)
   * [Frontend env vars](#frontend-env-vars)
-  * [Example files to copy](#example-files-to-copy)
 * [Local Development: Step by Step](#local-development-step-by-step)
 
   * [1. Clone and install](#1-clone-and-install)
