@@ -224,9 +224,9 @@ Note: if your code references `VITE_API_BASE` instead of `VITE_API_URL`, set tha
 ### 1. Clone and install
 
 ```bash
-# clone
+# clone and backend
 git clone git@github.com:filipilijevski/sports-booking.git
-cd ttclubwebsite
+cd backend
 
 # backend dependencies are resolved by Maven at build
 # verify Java and Maven
