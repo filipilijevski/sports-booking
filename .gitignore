@@ -1,0 +1,64 @@
+###############################################################################
+# Root ignores for a Spring Boot + React + PostgreSQL monorepo
+###############################################################################
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+logs/
+backend/*.log
+frontend/*.log
+
+# Node and build outputs (scoped where possible)
+**/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.vite/
+
+# Java/Maven build outputs
+**/target/
+**/build/
+
+# Coverage and reports
+coverage/
+coverage-report/
+jacoco.exec
+pit-reports/
+
+# Archives
+*.jar
+*.war
+*.ear
+
+# Local env files (anywhere)
+*.env
+*.env.*
+
+# Frontend envs and local overrides
+frontend/.env*
+!frontend/.env.example
+
+
+# Keep migrations tracked, but ignore DB dumps and backups
+*.dump
+dump.sql
+**/dumps/**
+**/backup/**
+
+
+# Local uploads and generated files
+backend/uploads/
+out/
+
+# Mac/Linux editor swap files
+*~
+*.swp
+

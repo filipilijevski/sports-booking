@@ -1,0 +1,169 @@
+server:
+  port: 8080
+  # Ensure correct client IP / scheme when behind a proxy or dev tunnel
+  forward-headers-strategy: framework
+
+spring:
+  datasource:
+    url: ${TTCLUB_DB_URL}
+    username: ${TTCLUB_DB_USER}
+    password: ${TTCLUB_DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: true      # turn off in production
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  logging:
+    level:
+      org.hibernate.SQL: debug       # turn off in production
+
+  management:
+    endpoints:
+      web.exposure.include: health,info,configprops
+    endpoint.health.show-details: when_authorized
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: [ openid, profile, email ]
+        provider:
+          google:
+            issuer-uri: https://accounts.google.com
+
+    # Provided in case we want switch to Spring's resource-server path.
+    resourceserver:
+      jwt:
+        secret: ${jwt.secret}
+
+# Gmail sender configuration:
+# - When gmail.oauth2.enabled=true and gmail.* are set, XOAUTH2 is used.
+# - Otherwise, if no Spring Mail sender is configured, we fall back to a DEV logging sender.
+gmail:
+  oauth2:
+    enabled: ${GMAIL_OAUTH2_ENABLED:false}
+  user: ${MAIL_USER:}
+  client-id: ${GOOGLE_CLIENT_ID:}
+  client-secret: ${GOOGLE_CLIENT_SECRET:}
+  refresh-token: ${GMAIL_REFRESH:}
+
+ttclub:
+  frontend-url: http://localhost:5173
+
+  cors:
+    allowed-origins:
+      - http://localhost:5173
+
+  # Mail subsystem toggles:
+  mail:
+    # When false, verification emails are not sent; they are LOGGED ONLY (for safe local dev).
+    enabled: ${MAIL_ENABLED:false}
+    # Optional SMTP connection test on startup (only when JavaMailSenderImpl is present).
+    startup-check: ${MAIL_STARTUP_CHECK:false}
+
+  # Auth & cookies
+  auth:
+    refresh-ttl-sec: 43200        # 12h sliding refresh token
+    # TTL for 6-digit verification codes (EmailCodeService)
+    code-ttl-sec: 600             # 10 minutes
+    # true  = legacy: include tokens in 302 redirect URL (query string)
+    # false = cookie-only: no tokens in URL (safer). Keep 'true' until SPA uses cookie auth.
+    redirect-include-tokens: ${OAUTH2_REDIRECT_INCLUDE_TOKENS:false}
+    accept-bearer-header: false  # true to accept Bearer tokens from SPA (optional; false is safer)
+
+  mfa:
+    issuer: tt-club
+    # enc-key is required and should be a base64 or raw string at least 16 bytes long. Set via env in prod.
+    enc-key: ${TTCLUB_MFA_ENC_KEY:development-please-change-me-32-bytes-long}
+
+  cookies:
+    secure: false                 # set true in production (HTTPS)
+    same-site: Lax                # Lax is fine for SPA XHR on same-site dev
+    domain: ""                    # keep empty for host-only cookies
+    path: /
+    access-name: access_token
+    refresh-name: refresh_token
+
+  # Registration role codes used by self-registration (optional; we do not really use this)
+  registration:
+    codes:
+      COACH: ${COACH_CODE:}
+      OWNER: ${OWNER_CODE:}
+      ADMIN: ${ADMIN_CODE:}
+
+  # CSRF double-submit filter (works with SPA XSRF-TOKEN cookie)
+  csrf:
+    enabled: true
+    cookie-name: XSRF-TOKEN
+    header-name: X-CSRF
+
+  ratelimit:
+    auth:
+      login:
+        limit: 1000
+        window-sec: 600
+      mfa-verify:
+        limit: 1000
+        window-sec: 600
+      send-code:
+        limit: 1000
+        window-sec: 600
+      password-reset:
+        limit: 1000
+        window-sec: 600
+      shop:
+        guest-payment-intents:
+          limit: 1000
+          window-sec: 900
+
+# JWT used by our JwtUtil (access token)
+jwt:
+  secret: ${TTCLUB_JWT_SECRET}
+  ttl-minutes: 300         # 6 hour access token
+  issuer:       http://localhost:8080
+  audience:     ttclub-api
+
+
+# Stripe credentials
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+
+canadapost:
+  username: ${CANADAPOST_USERNAME:}
+  password: ${CANADAPOST_PASSWORD:}
+  customer: ""
+
+store:
+  origin:
+    postal: K2P0J6
+
+shipping:
+  dims:
+    small:  28,21,4
+    medium: 33,25,10
+    large:  45,35,20
+  thresholds:
+    maxSmallItems: 2
+    maxSmallKg:    0.5
+    maxMediumKg:   5.0
+
+jobs:
+  legacy:
+    slot-materialiser:
+      enabled: false
+  program-materialiser:
+    enabled: true
+    cron: "0 0 1 * * *"
