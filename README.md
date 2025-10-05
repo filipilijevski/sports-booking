@@ -218,16 +218,6 @@ VITE_USE_COOKIE_AUTH=true
 
 Note: if your code references `VITE_API_BASE` instead of `VITE_API_URL`, set that instead. The default in this repository uses `VITE_API_URL`.
 
-### Example files to copy
-
-You can keep examples under version control and copy them for local use:
-
-```
-backend/.env.example              # optional helper file, not read by Spring directly
-frontend/.env.local.example       # copy to .env.local
-backend/src/main/resources/application.yml.example   # optional, if you prefer not to commit application.yml
-```
-
 ---
 
 ## Local Development: Step by Step
